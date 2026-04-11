@@ -48,4 +48,8 @@ public class UserService {
 
         return mapToResponse(user);
     }
+
+    public Boolean existBuUserId(String userId) {
+        return repository.existsById(userId);
+    }
 }
