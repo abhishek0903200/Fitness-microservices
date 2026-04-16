@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,24 +57,48 @@ public class ActivityAIService {
             List<String> suggestions = extractSuggestions(analysisJson.path("suggestions"));
             List<String> safety = extractSafetyGuidelines(analysisJson.path("safety"));
 
+            return Recommendation.builder()
+                    .activityId(activity.getId())
+                    .userId(activity.getUserId())
+                    .type(activity.getType().toString())
+                    .recommendation(fullAnalysis.toString().trim())
+                    .improvements(improvements)
+                    .suggestions(suggestions)
+                    .safety(safety)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
         } catch (Exception e) {
             e.printStackTrace();
+            return createDefaultRecommendation(activity);
         }
-        return null;
+    }
+
+    private Recommendation createDefaultRecommendation(Activity activity) {
+        return Recommendation.builder()
+                .activityId(activity.getId())
+                .userId(activity.getUserId())
+                .type(activity.getType().toString())
+                .recommendation("Unable to generate detailed analysis")
+                .improvements(Collections.singletonList("Continue with  your current routine"))
+                .suggestions(Collections.singletonList("Consider consulting a fitness consultant"))
+                .safety(Arrays.asList(
+                        "Always warm up before exercise",
+                        "Stay hydrated",
+                        "Listen to your body"
+                ))
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
     private List<String> extractSafetyGuidelines(JsonNode safetyNode) {
-        List<String> suggestions = new ArrayList<>();
+        List<String> safety = new ArrayList<>();
         if(safetyNode.isArray()){
-            safetyNode.forEach(suggestion -> {
-                String workout = suggestion.path("workout").asText();
-                String description = suggestion.path("description").asText();
-                suggestions.add(String.format("%s,%s,",workout,description));
-            });
+            safetyNode.forEach(item -> safety.add(item.asText()));
         }
-        return suggestions.isEmpty() ?
-                Collections.singletonList("No specific suggestions provided") :
-                suggestions;
+        return safety.isEmpty() ?
+                Collections.singletonList("Follow General safety Guideline") :
+                safety;
     }
 
     private List<String> extractSuggestions(JsonNode suggestionsNode) {
