@@ -19,12 +19,14 @@ public class UserService {
     public UserResponse register(RegisterRequest request) {
 
         if(repository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("Email already exists");
+            User existingUser = repository.findByEmail(request.getEmail());
+            return mapToResponse(existingUser);
         }
 
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
+        user.setKeyCloakId(request.getKeyCloakId());
         user.setLastName(request.getLastName());
         user.setFirstName(request.getFirstName());
 
@@ -38,6 +40,7 @@ public class UserService {
         response.setEmail(user.getEmail());
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
+        response.setKeyCloakId(user.getKeyCloakId());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
         return response;
@@ -51,8 +54,8 @@ public class UserService {
         return mapToResponse(user);
     }
 
-    public Boolean existBuUserId(String userId) {
+    public Boolean existByUserId(String userId) {
         log.info("Calling User Service {}", userId) ;
-        return repository.existsById(userId);
+        return repository.existsByKeyCloakId(userId);
     }
 }

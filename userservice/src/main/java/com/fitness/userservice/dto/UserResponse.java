@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @Data
 public class UserResponse {
     private String id;
+    private String keyCloakId;
     private String email;
     private String password;
     private String firstName;
@@ -14,4 +15,6 @@ public class UserResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public void setKeyCloakId(String keyCloakId) {
+    }
 }
