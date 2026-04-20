@@ -13,7 +13,7 @@ const ActivityForm = ({ onActivityAdded }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // await addActivity(activity);
+            await addActivity(activity);
             onActivityAdded();
             setActivity({ type: "RUNNING", duration: '', caloriesBurned: ''});
         } catch (error) {
